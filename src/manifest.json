@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Freee残業",
+  "version": "1.0.0",
+  "description": "freeeで残業時間を表示する",
+  "icons": {
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://p.secure.freee.co.jp/*"],
+      "include_globs": ["https://p.secure.freee.co.jp/#work_records/*"]
+    }
+  ]
+}
