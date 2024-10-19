@@ -16,6 +16,24 @@ const waitForElement = (selector, timeout = 10000) => {
   });
 };
 
+const showOvertime = (overtime) => {
+  document.getElementById("overtime")?.remove();
+  const overtimeElem = document.createElement("div");
+  overtimeElem.id = "overtime";
+  overtimeElem.classList.add("item");
+  const overtimeLabel = document.createElement("div");
+  overtimeLabel.classList.add("label");
+  overtimeLabel.textContent = "だいたいの残業時間";
+  const overtimeValue = document.createElement("div");
+  overtimeValue.classList.add("body");
+  overtimeValue.textContent = `${Math.trunc(overtime)} 時間 ${Math.round(
+    (overtime - Math.trunc(overtime)) * 60
+  )} 分`;
+  overtimeElem.appendChild(overtimeLabel);
+  overtimeElem.appendChild(overtimeValue);
+  document.querySelector(".items.main-items").appendChild(overtimeElem);
+};
+
 const calcOvertime = () => {
   if (!location.href.includes("#work_records")) {
     return;
@@ -41,29 +59,22 @@ const calcOvertime = () => {
         })
         .querySelector(".body");
 
-      const totalWorkHour = totalWorkTimeElem.querySelector(
-        ".hour-min__hour .hour-min__value"
-      ).textContent;
-      const totalWorkMinElem = totalWorkTimeElem.querySelector(
-        ".hour-min__min .hour-min__value"
-      );
-      const totalWorkMin = totalWorkMinElem ? totalWorkMinElem.textContent : 0;
+      const totalWorkHour =
+        Number(
+          totalWorkTimeElem.querySelector(".hour-min__hour .hour-min__value")
+            ?.textContent
+        ) || 0;
+      const totalWorkMin =
+        Number(
+          totalWorkTimeElem.querySelector(".hour-min__min .hour-min__value")
+            ?.textContent / 60
+        ) || 0;
 
-      const overtimeHour = totalWorkHour - dayCount * 8;
-
-      document.getElementById("overtime")?.remove();
-      const overtimeElem = document.createElement("div");
-      overtimeElem.id = "overtime";
-      overtimeElem.classList.add("item");
-      const overtimeLabel = document.createElement("div");
-      overtimeLabel.classList.add("label");
-      overtimeLabel.textContent = "だいたいの残業時間";
-      const overtimeValue = document.createElement("div");
-      overtimeValue.classList.add("body");
-      overtimeValue.textContent = `${overtimeHour} 時間 ${totalWorkMin} 分`;
-      overtimeElem.appendChild(overtimeLabel);
-      overtimeElem.appendChild(overtimeValue);
-      document.querySelector(".items.main-items").appendChild(overtimeElem);
+      chrome.storage.local.get(["dayWorkTime"]).then((result) => {
+        const overtime =
+          totalWorkHour + totalWorkMin - dayCount * result.dayWorkTime;
+        showOvertime(overtime);
+      });
     })
     .catch((err) => {
       console.error(err);
