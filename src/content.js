@@ -16,22 +16,36 @@ const waitForElement = (selector, timeout = 10000) => {
   });
 };
 
-const showOvertime = (overtime) => {
-  document.getElementById("overtime")?.remove();
+const addSummaryItem = (id, title, content) => {
+  document.getElementById(id)?.remove();
   const overtimeElem = document.createElement("div");
-  overtimeElem.id = "overtime";
+  overtimeElem.id = id;
   overtimeElem.classList.add("item");
   const overtimeLabel = document.createElement("div");
   overtimeLabel.classList.add("label");
-  overtimeLabel.textContent = "だいたいの残業時間";
+  overtimeLabel.textContent = title;
   const overtimeValue = document.createElement("div");
   overtimeValue.classList.add("body");
-  overtimeValue.textContent = `${Math.trunc(overtime)} 時間 ${Math.round(
-    (overtime - Math.trunc(overtime)) * 60
-  )} 分`;
+  overtimeValue.textContent = content;
   overtimeElem.appendChild(overtimeLabel);
   overtimeElem.appendChild(overtimeValue);
   document.querySelector(".items.main-items").appendChild(overtimeElem);
+};
+
+const showOvertime = (time) => {
+  addSummaryItem(
+    "overtime",
+    "だいたいの残業時間",
+    `${Math.trunc(time)} 時間 ${Math.round((time - Math.trunc(time)) * 60)} 分`
+  );
+};
+
+const showEstimated = (time) => {
+  addSummaryItem(
+    "estimated",
+    "このままいくと",
+    `${Math.trunc(time)} 時間 ${Math.round((time - Math.trunc(time)) * 60)} 分`
+  );
 };
 
 const calcOvertime = () => {
@@ -43,8 +57,7 @@ const calcOvertime = () => {
       const summaryItems = document.querySelectorAll(
         ".employee-work-record-summary .item"
       );
-
-      const dayCount = [...summaryItems]
+      const workedDayCount = [...summaryItems]
         .find((item) => {
           return item.querySelector(".label").innerHTML.startsWith("労働日数");
         })
@@ -70,10 +83,17 @@ const calcOvertime = () => {
             ?.textContent / 60
         ) || 0;
 
+      const remainWorkingDayCount = document.querySelectorAll(
+        "td.day:not(.work):not(.out-of-range):not([class*='holiday'])"
+      ).length;
+
       chrome.storage.local.get(["dayWorkTime"]).then((result) => {
         const overtime =
-          totalWorkHour + totalWorkMin - dayCount * result.dayWorkTime;
+          totalWorkHour + totalWorkMin - workedDayCount * result.dayWorkTime;
+        const estimated =
+          overtime + (overtime / workedDayCount) * remainWorkingDayCount;
         showOvertime(overtime);
+        showEstimated(estimated);
       });
     })
     .catch((err) => {
