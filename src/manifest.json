@@ -10,8 +10,7 @@
   "content_scripts": [
     {
       "js": ["content.js"],
-      "matches": ["https://p.secure.freee.co.jp/*"],
-      "include_globs": ["https://p.secure.freee.co.jp/#work_records/*"]
+      "matches": ["https://p.secure.freee.co.jp/*"]
     }
   ]
 }

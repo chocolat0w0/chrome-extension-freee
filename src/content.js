@@ -17,6 +17,9 @@ const waitForElement = (selector, timeout = 10000) => {
 };
 
 const calcOvertime = () => {
+  if (!location.href.includes("#work_records")) {
+    return;
+  }
   waitForElement(".employee-work-record-summary")
     .then(() => {
       const summaryItems = document.querySelectorAll(
