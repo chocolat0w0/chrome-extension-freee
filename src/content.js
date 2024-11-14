@@ -57,22 +57,41 @@ const calculate = () => {
       const summaryItems = document.querySelectorAll(
         ".employee-work-record-summary .item"
       );
-      const workedDayCount = Number(
-        [...summaryItems]
-          .find((item) => {
-            return item
-              .querySelector(".label")
-              .innerHTML.startsWith("労働日数");
-          })
-          .querySelector(".body")
-          .textContent.replace("日", "")
-      );
+
+      const hasHolidayWork =
+        [...summaryItems].find((item) => {
+          return item
+            .querySelector(".label")
+            ?.innerHTML.startsWith("所定労働日の労働日数");
+        }) !== undefined;
+
+      const workedDayCount = hasHolidayWork
+        ? Number(
+            [...summaryItems]
+              .find((item) => {
+                return item
+                  .querySelector(".label")
+                  ?.innerHTML.startsWith("所定労働日の労働日数");
+              })
+              .querySelector(".body")
+              .textContent.replace("日", "")
+          )
+        : Number(
+            [...summaryItems]
+              .find((item) => {
+                return item
+                  .querySelector(".label")
+                  ?.innerHTML.startsWith("労働日数");
+              })
+              .querySelector(".body")
+              .textContent.replace("日", "")
+          );
 
       const totalWorkTimeElem = [...summaryItems]
         .find((item) => {
           return item
             .querySelector(".label")
-            .innerHTML.startsWith("総勤務時間");
+            ?.innerHTML.startsWith("総勤務時間");
         })
         .querySelector(".body");
       const totalWorkHour =
