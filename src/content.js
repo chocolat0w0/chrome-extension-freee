@@ -48,7 +48,7 @@ const showEstimated = (time) => {
   );
 };
 
-const calcOvertime = () => {
+const calculate = () => {
   if (!location.href.includes("#work_records")) {
     return;
   }
@@ -57,12 +57,16 @@ const calcOvertime = () => {
       const summaryItems = document.querySelectorAll(
         ".employee-work-record-summary .item"
       );
-      const workedDayCount = [...summaryItems]
-        .find((item) => {
-          return item.querySelector(".label").innerHTML.startsWith("労働日数");
-        })
-        .querySelector(".body")
-        .textContent.replace("日", "");
+      const workedDayCount = Number(
+        [...summaryItems]
+          .find((item) => {
+            return item
+              .querySelector(".label")
+              .innerHTML.startsWith("労働日数");
+          })
+          .querySelector(".body")
+          .textContent.replace("日", "")
+      );
 
       const totalWorkTimeElem = [...summaryItems]
         .find((item) => {
@@ -71,7 +75,6 @@ const calcOvertime = () => {
             .innerHTML.startsWith("総勤務時間");
         })
         .querySelector(".body");
-
       const totalWorkHour =
         Number(
           totalWorkTimeElem.querySelector(".hour-min__hour .hour-min__value")
@@ -91,7 +94,9 @@ const calcOvertime = () => {
         const overtime =
           totalWorkHour + totalWorkMin - workedDayCount * result.dayWorkTime;
         const estimated =
-          overtime + (overtime / workedDayCount) * remainWorkingDayCount;
+          workedDayCount === 0
+            ? 0
+            : overtime + (overtime / workedDayCount) * remainWorkingDayCount;
         showOvertime(overtime);
         showEstimated(estimated);
       });
@@ -101,7 +106,7 @@ const calcOvertime = () => {
     });
 };
 
-calcOvertime();
+calculate();
 
 // 表示月を変更した際に再計算
-window.addEventListener("hashchange", calcOvertime, false);
+window.addEventListener("hashchange", calculate, false);
