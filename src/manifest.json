@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Freee残業",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "freeeで残業時間を表示する",
   "permissions": ["storage"],
   "icons": {
